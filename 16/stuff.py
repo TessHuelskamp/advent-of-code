@@ -4,14 +4,19 @@ with open("./input.txt", "r") as f:
 
 bits = map(lambda x: bin(int(x, 16)), chars)
 bitsLeadingZeros = map(lambda x: x[2:].zfill(4), bits)
-
-
 allBits = "".join(bitsLeadingZeros)
 
 packetStart=0
 sumVersionNumbers = 0
-try:
+def parse(packetStart):
+    global sumVersionNumbers
     while packetStart < len(allBits):
+
+        # Ignore the trailing zeros
+        stuff = allBits.find("1", packetStart)
+        if stuff < 0:
+            break
+
         version = allBits[packetStart:packetStart+3]
         typeID = allBits[packetStart+3:packetStart+6]
         versionInt = int(version, 2)
@@ -56,12 +61,10 @@ try:
                 print(allBits[packetStart:packetStart+11], end=",")
                 # contains number of subpackets that are part of this packet
         print()
-except IndexError:
-    # trailing zeros are fine I guess :sweat:
-    print()
-    print(packetStart)
-    pass
 
+
+
+parse(0)
 assert sumVersionNumbers == 951
 print(sumVersionNumbers)
 
