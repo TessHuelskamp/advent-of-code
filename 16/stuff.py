@@ -6,31 +6,30 @@ bits = map(lambda x: bin(int(x, 16)), chars)
 bitsLeadingZeros = map(lambda x: x[2:].zfill(4), bits)
 allBits = "".join(bitsLeadingZeros)
 
-packetStart=0
+packetIndex=0
 sumVersionNumbers = 0
-def parse(packetStart):
+
+packets = dict()
+def parse(packetIndex):
     global sumVersionNumbers
-    while packetStart < len(allBits):
+    while packetIndex < len(allBits):
+        ogStart=packetIndex
+        packetString=""
 
         # Ignore the trailing zeros
-        stuff = allBits.find("1", packetStart)
+        stuff = allBits.find("1", packetIndex)
         if stuff < 0:
             break
 
-        version = allBits[packetStart:packetStart+3]
-        typeID = allBits[packetStart+3:packetStart+6]
+        version = allBits[packetIndex:packetIndex+3]
+        typeID = allBits[packetIndex+3:packetIndex+6]
         versionInt = int(version, 2)
         typeIDInt = int(typeID, 2)
 
-        if typeIDInt == 4:
-            print("literal")
-        else:
-            print("not literal")
+        packetString = "l:" if typeIDInt == 4 else "x:"
+        packetString += version + "," + typeID
 
-        print(allBits[packetStart:packetStart+3], end=",")
-        print(allBits[packetStart+3:packetStart+6], end=",")
-
-        packetStart += 6 
+        packetIndex += 6
         sumVersionNumbers += versionInt
 
 
@@ -41,29 +40,31 @@ def parse(packetStart):
             literalBits = ""
             shouldContinue=True
             while shouldContinue:
-                shouldContinue = allBits[packetStart] == "1"
-                literalBits += allBits[packetStart+1:packetStart+5]
-                print(allBits[packetStart:packetStart+5], end=",")
-                packetStart += 5
+                shouldContinue = allBits[packetIndex] == "1"
+                literalBits += allBits[packetIndex+1:packetIndex+5]
+                packetString += allBits[packetIndex:packetIndex+5]
+                packetIndex += 5
+                if shouldContinue:
+                    packetString+= ","
             literal = int(literalBits, 2)
-
         else:
-            lengthTypeBit = allBits[packetStart]
-            print(lengthTypeBit, end=",")
-            packetStart += 1 
+            lengthTypeBit = allBits[packetIndex]
+            packetString += lengthTypeBit + ","
+            packetIndex += 1
             if lengthTypeBit == "0":
                 # 15 bits describe length of subpacket
-                packetStart += 15
-                print(allBits[packetStart:packetStart+15], end=",")
-                # TODO sub processing
+                packetIndex += 15
+                packetString+= allBits[packetIndex:packetIndex+15]
             elif lengthTypeBit == "1":
-                packetStart += 11
-                print(allBits[packetStart:packetStart+11], end=",")
-                # contains number of subpackets that are part of this packet
-        print()
+                packetIndex += 11
+                packetString+= allBits[packetIndex:packetIndex+11]
 
 
-
+        packets[ogStart] = packetString
+        packetSize = packetIndex-ogStart
+        assert packetSize == sum(1 for x in packetString if x in "01")
+        print(ogStart, packetIndex-ogStart, packetString)
+    
 parse(0)
 assert sumVersionNumbers == 951
 print(sumVersionNumbers)
