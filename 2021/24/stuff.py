@@ -83,9 +83,44 @@ class ALU:
     def isValid(self):
         return self.get("z") == 0
 
+    def getZ(self): return self.get("z")
+
+inputs = ((12, 1, 7), (13, 1, 8), (13, 1, 10), (-2, 26, 4), (-10, 26, 4), (13, 1, 6), (-14, 26, 11), (-5, 26, 13), (15, 1, 1), (15, 1, 8), (-14, 26, 4), (10, 1, 13), (-14, 26, 4), (-5, 26, 14))
+
+def block(z, modelChar, step):
+    firstAdd, divThing, secondAdd = inputs[step]
+
+    modelChar = int(modelChar)
+
+    x=(z%26)+firstAdd
+    z //= divThing
+
+    if x!=modelChar:
+        z*=26
+        z+=modelChar + secondAdd
+
+    return z
+
+def evaluate(number):
+    z = 0
+    for i, c in enumerate(str(number)):
+        z = block(z, c, i)
+    return z
+
+
 
 
 alu = ALU(instructions)
+
+testString1 = "12345678901234"
+testString2 = "98765432109876"
+assert len(testString1) == 14
+alu.run(testString2)
+print(alu.getZ())
+print(evaluate(testString2))
+assert alu.getZ() == evaluate(testString2)
+alu.run(testString2)
+assert alu.getZ() == evaluate(testString2)
 
 def hasZero(number): return any( int(x)==0 for x in str(number))
 assert hasZero(10)
