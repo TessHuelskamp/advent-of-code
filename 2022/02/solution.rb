@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-file = File.open('input.txt')
+file = File.open('2022/02/input.txt')
 file_data = file.readlines
 
 values = {
@@ -100,8 +100,6 @@ file_data.each do |l|
   my_result = result[me.to_sym]
 
   my_move = should_play(their_move, my_result)
-
-  puts(their_move, my_result, my_move, points[my_move], game_result(my_result))
 
   total_b += game_result(my_result)
   total_b += points[my_move]
