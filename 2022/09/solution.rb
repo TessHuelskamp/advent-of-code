@@ -44,34 +44,35 @@ end
 # rubocop:enable Metrics/PerceivedComplexity
 # rubocop:enable Metrics/AbcSize
 
-head_x = 0
-head_y = 0
-tail_x = 0
-tail_y = 0
+locations = {
+  head: [0, 0],
+  one: [0, 0]
+}
 
 location_one = Set[]
-location_one.add("#{tail_x}-#{tail_y}")
+location_one.add('0-0')
 
 moves.split('').each do |move|
   # puts "#{move}----"
   case move
   when 'L'
-    head_x -= 1
+    locations[:head][0] -= 1
   when 'R'
-    head_x += 1
+    locations[:head][0] += 1
   when 'U'
-    head_y += 1
+    locations[:head][1] += 1
   when 'D'
-    head_y -= 1
+    locations[:head][1] -= 1
   end
 
-  tail_x, tail_y = move_tail(head_x, head_y, tail_x, tail_y)
+  locations[:one][0], locations[:one][1] = move_tail(locations[:head][0], locations[:head][1], locations[:one][0],
+                                                     locations[:one][1])
 
   # puts "H #{head_x}, #{head_y}"
   # puts "T #{tail_x}, #{tail_y}"
   # puts "T'#{tail_x}, #{tail_y}"
 
-  location_one.add("#{tail_x}-#{tail_y}")
+  location_one.add("#{locations[:one][0]}-#{locations[:one][1]}")
 end
 
 # 5883
