@@ -9,14 +9,6 @@ moves = file_data.flat_map do |l|
   move * count.to_i
 end.join('')
 
-head_x = 0
-head_y = 0
-tail_x = 0
-tail_y = 0
-
-locations = Set[]
-locations.add("#{tail_x}-#{tail_y}")
-
 # rubocop:disable Metrics/CyclomaticComplexity
 # rubocop:disable Metrics/MethodLength
 # rubocop:disable Metrics/PerceivedComplexity
@@ -52,6 +44,14 @@ end
 # rubocop:enable Metrics/PerceivedComplexity
 # rubocop:enable Metrics/AbcSize
 
+head_x = 0
+head_y = 0
+tail_x = 0
+tail_y = 0
+
+location_one = Set[]
+location_one.add("#{tail_x}-#{tail_y}")
+
 moves.split('').each do |move|
   # puts "#{move}----"
   case move
@@ -71,8 +71,8 @@ moves.split('').each do |move|
   # puts "T #{tail_x}, #{tail_y}"
   # puts "T'#{tail_x}, #{tail_y}"
 
-  locations.add("#{tail_x}-#{tail_y}")
+  location_one.add("#{tail_x}-#{tail_y}")
 end
 
 # 5883
-puts locations.size
+puts location_one.size
