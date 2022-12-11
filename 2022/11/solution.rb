@@ -18,7 +18,11 @@ class Monkey
   end
 
   def eval_item(item)
-    new_value = @eval_op.call(item) / 3
+    new_value = if @@part1
+                  @eval_op.call(item) / 3
+                else
+                  @eval_op.call(item) % @@mod_product
+                end
     next_monkey_idx = @test_op.call(new_value) ? @if_true : @if_false
     [new_value, next_monkey_idx]
   end
@@ -41,7 +45,8 @@ class Monkey
 end
 
 class MonkeyContainer
-  def initialize
+  def initialize(rounds)
+    @rounds = rounds
     @monkeys = {
       0 => Monkey.new(
         [66, 59, 64, 51],
@@ -103,10 +108,10 @@ class MonkeyContainer
   end
 
   def play_game
-    20.times { round }
+    @rounds.times { round }
   end
 
-  def part1
+  def answer
     @monkeys.values.map(&:get_total_handled).max(2).reduce(:*)
   end
 
@@ -128,7 +133,12 @@ class MonkeyContainer
 end
 # rubocop:enable Style/Documentation
 
-container = MonkeyContainer.new
+@@part1 = false
+@@mod_product = [2, 7, 11, 19, 3, 5, 17, 13].reduce(:*)
 
+container = MonkeyContainer.new(@@part1 == 3 ? 20 : 10_000)
+
+# Part 1 -  90294
+# part 2 - 18170818354
 container.play_game
-puts container.part1
+puts container.answer
