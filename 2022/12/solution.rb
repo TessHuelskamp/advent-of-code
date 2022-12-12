@@ -44,16 +44,33 @@ class IHateRuby
     @end_i = end_i
     @end_j = end_j
 
+    @heights[@end_i][@end_j] = 25 # ??? my init is broken ??
+
     @shortest_path_cache = []
     @heights.size.times do
       row = []
       @heights[0].size.times { row << 100_000 }
       @shortest_path_cache << row
     end
+
+    @part_two_cache = []
+    @heights.size.times do
+      row = []
+      @heights[0].size.times { row << 100_000 }
+      @part_two_cache << row
+    end
   end
 
   def shortest
     @shortest_path_cache[@end_i][@end_j]
+  end
+
+  def shortest_a
+    (0..@heights.size - 1).flat_map do |i|
+      (0..@heights[0].size - 1).flat_map do |j|
+        @part_two_cache[i][j] if @heights[i][j].zero?
+      end
+    end.reject(&:nil?).min
   end
 
   def list_neighbors(i, j)
@@ -64,7 +81,6 @@ class IHateRuby
   end
 
   def traverse
-    # heap?
     to_visit = [[@start_i, @start_j, 0]]
     to_visit_set = [[@start_i, @start_j, 0]].to_set
 
@@ -91,8 +107,36 @@ class IHateRuby
     end
   end
 
+  def traverse_part_two
+    to_visit = [[@end_i, @end_j, 0]]
+
+    while to_visit.size.positive?
+      i, j, cost = to_visit.first
+      to_visit.delete_at(0)
+
+      # puts "#{i} #{j} #{cost} #{to_visit.take(10)}"
+
+      next if @part_two_cache[i][j] <= cost
+
+      @part_two_cache[i][j] = cost
+
+      list_neighbors(i, j).each do |val|
+        ii, jj = val
+
+        # "#{ii} #{jj} #{@part_two_cache[ii][jj]} #{@heights[i][j] - @heights[ii][jj]} "
+        # puts "#{@heights[i][j]} #{@heights[ii][jj]}"
+
+        next if @part_two_cache[ii][jj].nil?
+        next if @part_two_cache[ii][jj] <= cost
+        next if @heights[i][j] - @heights[ii][jj] > 1
+
+        to_visit << [ii, jj, cost + 1]
+      end
+    end
+  end
+
   def print_map
-    @shortest_path_cache.each do |line|
+    @part_two_cache.each do |line|
       puts line.join(',')
     end
   end
@@ -101,9 +145,9 @@ end
 # puts heights.size * heights[0].size
 my_map = IHateRuby.new(heights, start_i, start_j, end_i, end_j)
 my_map.traverse
-# my_map.print_map
+my_map.traverse_part_two
+my_map.print_map
 
+# 350
 puts my_map.shortest
-
-# too high = 1128
-# too high 352, 351
+puts my_map.shortest_a
