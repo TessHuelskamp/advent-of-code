@@ -8,12 +8,12 @@ require 'set'
 def map_char(char)
   case char
   when 'E'
-    26
+    char = 'a'
   when 'S'
-    0
-  else
-    char.ord - 'a'.ord
+    char = 'z'
   end
+
+  char.ord - 'a'.ord
 end
 
 start_i = 0
@@ -36,24 +36,24 @@ heights = file_data.reject(&:nil?).map.with_index do |line, i|
   line.split('').map { |c| map_char(c) }
 end
 
-puts start_i, start_j, end_i, end_j
-
 class IHateRuby
   def initialize(heights, start_i, start_j, end_i, end_j)
     @heights = heights
-    @shortest_trek = 10_000_000
     @start_i = start_i
     @start_j = start_j
     @end_i = end_i
     @end_j = end_j
+
+    @shortest_path_cache = []
+    @heights.size.times do
+      row = []
+      @heights[0].size.times { row << 100_000 }
+      @shortest_path_cache << row
+    end
   end
 
-  def get_shortest
-    @shortest_trek
-  end
-
-  def start_dfs
-    dfs_search(@start_i, @start_j, 0, [].to_set)
+  def shortest
+    @shortest_path_cache[@end_i][@end_j]
   end
 
   def list_neighbors(i, j)
@@ -63,36 +63,47 @@ class IHateRuby
     end
   end
 
-  def uniq_id(i, j)
-    "#{i}-#{j}"
+  def traverse
+    # heap?
+    to_visit = [[@start_i, @start_j, 0]]
+    to_visit_set = [[@start_i, @start_j, 0]].to_set
+
+    while to_visit.size.positive?
+      i, j, cost = to_visit.first
+      to_visit.delete_at(0)
+      #   puts "#{i} #{j} #{cost}, #{to_visit.take(10)}" if rand(0..1000).zero?
+
+      next if @shortest_path_cache[i][j] <= cost
+
+      @shortest_path_cache[i][j] = cost
+
+      list_neighbors(i, j).each do |val|
+        ii, jj = val
+
+        next if @shortest_path_cache[ii][jj].nil?
+        next if @shortest_path_cache[ii][jj] <= cost
+        next if @heights[ii][jj] - @heights[i][j] > 1
+        next if to_visit_set.include?([ii, jj, cost + 1])
+
+        to_visit_set.add([ii, jj, cost + 1])
+        to_visit << [ii, jj, cost + 1]
+      end
+    end
   end
 
-  def dfs_search(i, j, total, seen)
-    if i == @end_i && j == @end_j
-      if total < @shortest_trek
-        @shortest_trek = total
-        puts @shortest_trek
-      end
-      return
-    end
-
-    total += 1
-
-    return if total >= @shortest_trek
-
-    seen.add(uniq_id(i, j))
-
-    list_neighbors(i, j).each do |val|
-      ii, jj = val
-
-      next if seen.include? uniq_id(ii, jj)
-      next if @heights[ii][jj] - @heights[i][j] > 1
-
-      dfs_search(ii, jj, total, seen.dup)
+  def print_map
+    @shortest_path_cache.each do |line|
+      puts line.join(',')
     end
   end
 end
 
+# puts heights.size * heights[0].size
 my_map = IHateRuby.new(heights, start_i, start_j, end_i, end_j)
-my_map.start_dfs
-my_map.get_shortest
+my_map.traverse
+# my_map.print_map
+
+puts my_map.shortest
+
+# too high = 1128
+# too high 352, 351
