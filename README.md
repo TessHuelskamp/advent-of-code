@@ -1,3 +1,3 @@
 # advent-of-code
 
-I'm going to try to learn typescript this year but I will probably end up using python in the end instead :) 
+Every year I kid myself and think that I'll learn a new language while doing these *and* complete all 25 puzzles... 
