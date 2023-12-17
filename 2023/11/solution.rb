@@ -56,9 +56,7 @@ res = planets.combination(2).map{|p|
   # puts "(#{p[0]} #{p[1]})"
   # puts "#{i1 - i0}+#{num_col_gaps_walked}, #{j1-j0}+#{num_row_gaps_walked}"
 
-  (i1-i0)  + (j1-j0) + (num_col_gaps_walked + num_row_gaps_walked) * (1000000-1)
+  (i1-i0) + (j1-j0) + (num_col_gaps_walked + num_row_gaps_walked) * (1000000-1)
 }.sum
 
-
-# too high
 puts res
