@@ -92,7 +92,4 @@ enclosed_values = 0
   }
 }
 
-# low 165
-# 349?>?
-# high 361
 puts enclosed_values
