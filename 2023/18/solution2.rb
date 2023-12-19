@@ -1,4 +1,4 @@
-file = File.open("input.sample.txt")
+file = File.open("input.txt")
 file_data = file.readlines
 
 """
@@ -6,25 +6,22 @@ I gathered this info from reading a bunch of reddit threads and looking at other
 
 We can find the *area* of the box by using the shoelace formula (which is the triangle sum).
 The area is *NOT* the answer for us because we need to figure out the number of x,y points inside the area beacuse those correspond with a lava bucket.
-We can use the Pick theorem for that.
+We can rearrange the pick theorm with the area we have to solve for the number of dots in the polygon
 
 Then, once we have the number of points in the box, we can add the length of the border to get the answer.
-
 """
-border_length = file_data.map{|l|
-  l.chomp!
-
-  l[6,5].to_i(16)
-}.sum
 
 i, j = 0, 0
+border_length = 0
 i_j_points = file_data.map{|l|
   l.chomp!
 
-  distance = l[6,5].to_i(16)
-  direction = l[11]
+  color = l.split(" ").last
+  distance = color[2,5].to_i(16)
+  direction = color[7]
 
-  # 0 means R, 1 means D, 2 means L, and 3 means U.
+  border_length += distance
+
   case direction
   when "U", "3"
     i+=distance
@@ -39,11 +36,6 @@ i_j_points = file_data.map{|l|
   [i, j]
 }
 
-
-i_j_points.each{|p|
-  puts "(#{p[0]}, #{p[1]})"
-}
-
 def calc_shoelace_area(points)
   area = points.map.with_index{|p, i|
     i1, j1 = p
@@ -56,17 +48,18 @@ def calc_shoelace_area(points)
     return area/2
   else
     # if the order is not given counterclockwise you need to reverse it
-    return calc_shoelace_area(points.reverse)
+    calc_shoelace_area(points.reverse)
   end
 end
 
-# areaOfInterior = interiorPoints + boundrayPoints/2 -1
 shoelace_area = calc_shoelace_area(i_j_points)
 puts "Shoelace area: #{shoelace_area}"
+
+# original Pick theorm
+# areaOfInterior = interiorPoints + boundrayPoints/2 -1
 interiorPoints = shoelace_area - border_length/2 + 1
 
-puts "Interior points: #{interiorPoints}"
+puts "# of interior points: #{interiorPoints}"
 
-# sample input: 952408144115
 puts "Polygon Border: #{border_length}"
-puts interiorPoints + border_length
+puts "Answer: #{interiorPoints + border_length}"
