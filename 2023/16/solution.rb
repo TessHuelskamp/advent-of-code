@@ -59,8 +59,6 @@ def runBoard(i, j, direction)
     currentTuple = toVisit.shift
     seen.add(currentTuple)
 
-    # puts "#{currentTuple}"
-
     i, j, direction = currentTuple
     cell = $board[i][j]
 

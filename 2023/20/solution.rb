@@ -67,7 +67,15 @@ pulsesSent = {
   :low => 0, :high => 0
 }
 
-until i>=1000
+# button 'rx' is controlled by inputs to 'bq'
+bqParents ={
+  'vg' => 0,
+  'kp' => 0,
+  'gc' => 0,
+  'tx' => 0,
+}
+
+while bqParents.values.any?(&:zero?)
   signals << ["button", :low, "broadcaster"]
   i+=1
 
@@ -108,6 +116,10 @@ until i>=1000
      # puts "#{node} #{allHigh} #{nextPulse}"
     end
 
+    if bqParents.include?(node) && nextPulse == :high
+      bqParents[node]=i if bqParents[node].zero?
+    end
+
     nodeChildren[node].each{|dest|
       signals << [node, nextPulse, dest]
     }
@@ -115,3 +127,5 @@ until i>=1000
 end
 
 puts pulsesSent[:low] * pulsesSent[:high]
+puts "#{bqParents}"
+puts bqParents.values.inject(:lcm)
