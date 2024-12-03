@@ -389,23 +389,112 @@ end
 file = File.open("input.sample.txt")
 file_data = file.readlines
 
-lava_pool = file_data.map{|l|
+$lava_pool = file_data.map{|l|
   l.chomp!
 
   l.split('').map{|d| d.to_i}
 }
 
-minHeap = Heap.new()
 
-minHeap << [0, 0, 0, 0, :east]
-minHeap << [10, 0, 0, 0, :east]
-minHeap << [3, 0, 0, 0, :east]
-
-# cost, i, j, num_steps_taken, incoming_direction
-
-until minHeap.empty?
-  nextNode = minHeap.pop
-
-  puts nextNode.map{|x| x.to_s}.join("-")
+def cellKey(i, j)
+  "#{i}-#{j}"
 end
+
+def allDirections
+  [:north, :south, :east, :west]
+end
+
+def oppositeDirection(direction)
+  case direction
+  when :north
+    :south
+  when :south
+    :north
+  when :east
+    :west
+  when :west
+    :east
+  end
+end
+
+def possibleDirections(i, j, num_steps_taken, incoming_direction)
+    potential = allDirections - [oppositeDirection(incoming_direction)]
+
+    if num_steps_taken >=3
+      potential -= [incoming_direction]
+    end
+
+    potential
+end
+
+def possibleMoves(i, j, num_steps_taken, incoming_direction)
+  directionOptions = possibleDirections(i, j, num_steps_taken, incoming_direction)
+
+  directionOptions.map{|d|
+    case d
+    when :north
+      [i-1, j, d]
+    when :south
+      [i+1, j, d]
+    when :east
+      [i, j+1, d]
+    when :west
+      [i, j-1, d]
+    end
+  }.select{ |x|
+    i, j, _ = x
+
+    0<=i && i<$lava_pool.length && 0<=j && j<$lava_pool[0].length
+  }
+end
+
+
+minHeap = Heap.new()
+minHeap << [0, 0, 0, 1, :east]
+globalMinimums = {}
+destinationI, destinationJ = $lava_pool.length-1, $lava_pool[0].length-1
+seen={}
+
+count =0
+# cost, i, j, num_steps_taken, incoming_direction
+until globalMinimums.include?(cellKey(destinationI, destinationJ)) || minHeap.empty? || count >=1000
+  count +=1
+  cost, i, j, num_steps_taken, incoming_direction = minHeap.pop
+
+  seenString = "#{i}-#{j}-#{num_steps_taken}-#{incoming_direction}"
+  next if seen.include?(seenString)
+  seen[seenString]=true
+
+  puts "(#{i},#{j}) #{$lava_pool[i][j]} c:#{cost}, s:#{num_steps_taken}, d:#{incoming_direction.to_s}"
+
+  # store cost onto global mins
+  if globalMinimums.include?(cellKey(i, j))
+    globalMinimums[cellKey(i, j)] = [globalMinimums[cellKey(i, j)], cost].min
+  else
+    globalMinimums[cellKey(i, j)] = cost
+  end
+
+  # find possible directions
+  moves = possibleMoves(i, j, num_steps_taken, incoming_direction)
+  # moves.each{|x|
+  #   puts x.map{|y| y.to_s}.join(" ")
+  # }
+
+  # put them onto the heap
+  moves.each{ |x|
+    nextI, nextJ, nextDirection = x
+    nextCost = cost+$lava_pool[nextI][nextJ]
+
+    nextStepCount = nextDirection == incoming_direction ?  num_steps_taken + 1 : 1
+
+    puts "-(#{nextI}, #{nextJ}) #{$lava_pool[nextI][nextJ]} c:#{nextCost} s:#{nextStepCount} d:#{nextDirection}"
+
+    # cost, i, j, num_steps_taken, incoming_direction
+    minHeap << [nextCost, nextI, nextJ, nextStepCount, nextDirection]
+  }
+  
+end
+
+puts
+puts "ans:#{globalMinimums[cellKey(destinationI, destinationJ)]}"
 
