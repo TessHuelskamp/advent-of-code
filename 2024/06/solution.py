@@ -1,6 +1,5 @@
 debug = False
 
-
 board = []
 
 startingI, startingJ = 0, 0
@@ -12,8 +11,6 @@ with open("./input.sample.txt" if debug else "./input.txt", "r") as f:
     if "^" in line:
       startingI = len(board)-1
       startingJ = line.find("^")
-
-
 
 
 def rotateRight(dir):
@@ -32,8 +29,7 @@ def nextSpot(i, j, dir):
 
 
 def onBoard(i, j):
-  return 0 <= i and i <len(board) and 0 <=j and j <len(board[0])
-
+  return 0 <= i and i<len(board) and 0<=j and j<len(board[0])
 
 def key(i, j):
   return str(i)+"-"+str(j)
@@ -55,19 +51,19 @@ def runRoute(startingI, startingJ, direction):
     if loopKey in visitedLoop:
       return len(visited), True
     
-    visitedLoop.add(loopKey)
     visited.add(key(i, j))
-
+    visitedLoop.add(loopKey)
+    
     nextI, nextJ = nextSpot(i, j, direction)
 
-
-    try: 
-      if board[nextI][nextJ] == "#":
-        direction = rotateRight(direction)
-      else:
-        i, j = nextI, nextJ
-    except IndexError:
+    if not onBoard(nextI, nextJ):
+      return len(visited), False
+    
+    if board[nextI][nextJ] == "#":
+      direction = rotateRight(direction)
+    else:
       i, j = nextI, nextJ
+   
 
   return len(visited), False
 
@@ -75,14 +71,12 @@ def runRoute(startingI, startingJ, direction):
 initialDirection = "N"
 
 partOne, _ = runRoute(startingI, startingJ, initialDirection)
-
 print(partOne)
 
 partTwo = 0
 
 # This takes about 45 seconds :)
 for i in range(len(board)):
-  
   for j in range(len(board)):
     if board[i][j] == "#": continue
 
@@ -92,17 +86,9 @@ for i in range(len(board)):
 
     if loop: partTwo +=1
 
-
+    # put things back
     board[i][j] = "."
 
 
 
 print(partTwo)
-
-    
-  
-                                                       
-
-
-
-
