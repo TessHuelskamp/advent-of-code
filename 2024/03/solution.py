@@ -13,8 +13,6 @@ def process(stuff):
   results = re.findall(r"mul\([0-9]{1,3},[0-9]{1,3}\)", stuff)
 
   return sum([multiply(x) for x in results])
-
-
  
 
 

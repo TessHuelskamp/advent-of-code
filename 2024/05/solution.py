@@ -11,7 +11,7 @@ def addRule(left, right):
 
 def fixRow(row):
   while not rowValid(row):
-    # loop thru each row swapping errors
+    # loop thru the row swapping errors as we find them
 
     left=set()
 
@@ -67,9 +67,7 @@ with open("./input.sample.txt" if debug else "./input.txt", "r") as f:
       continue
 
     
-    row = line.split(",")
- 
-  
+    row = line.split(",") 
     correctOrder = rowValid(row)
 
     halfIdx = int(len(row)/2)

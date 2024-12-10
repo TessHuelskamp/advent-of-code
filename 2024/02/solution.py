@@ -52,8 +52,8 @@ with open("./input.txt", "r") as f:
 
     
     # This has rough run time complexity buuutttt.....
+    # It works and it's easier that computing where the error is and trying to correct it
     valid=False
-    
     for i in range(len(level)):
       if valid: break
       
@@ -61,13 +61,6 @@ with open("./input.txt", "r") as f:
         partTwo+=1
         valid=True
         
-
-    
-  
-    
-
-  
-
 
 print(partOne)
 print(partTwo)
