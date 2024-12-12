@@ -29,7 +29,7 @@ def rKey(keyStr):
   i, j = keyStr.split(DELIM)
   return int(i), int(j)
 
-def sideKey(i, j, dir):return str(i)+DELIM+str(j)+dir
+def sideKey(i, j, dir):return str(i)+DELIM+str(j)+DELIM+dir
 def rSideKey(keyStr):
   i, j, dir = keyStr.split(DELIM)
   return int(i), int(j), dir
@@ -38,36 +38,36 @@ def rSideKey(keyStr):
 # There can be multiple section of each plant
 globalVisited=set()
 
-def totalSide(mySet, dir):
+def totalSides(mySet):
   total = 0
   while mySet:
     total += 1
     currentSide = mySet.pop()
 
-    i, j, = rKey(currentSide)
+    i, j, dir = rSideKey(currentSide)
 
     # Traverse the fence to see if there are nearby fences.
     # Kick them out the set if needed
     # These should really be fns but this works so...
     if dir == "E" or dir == "W":
       step = 1
-      while key(i-step, j) in mySet:
-        mySet.remove(key(i-step, j))
+      while sideKey(i-step, j, dir) in mySet:
+        mySet.remove(sideKey(i-step, j, dir))
         step+=1
 
       step = 1
-      while key(i+step, j) in mySet:
-        mySet.remove(key(i+step, j))
+      while sideKey(i+step, j, dir) in mySet:
+        mySet.remove(sideKey(i+step, j, dir))
         step+=1
     elif dir == "N" or dir == "S":
       step = 1
-      while key(i, j-step) in mySet:
-        mySet.remove(key(i, j-step))
+      while sideKey(i, j-step, dir) in mySet:
+        mySet.remove(sideKey(i, j-step, dir))
         step+=1
         
       step = 1
-      while key(i, j+step) in mySet:
-        mySet.remove(key(i, j+step))
+      while sideKey(i, j+step, dir) in mySet:
+        mySet.remove(sideKey(i, j+step, dir))
         step+=1
     else:
       print('unknown dir')
@@ -80,8 +80,7 @@ def fillPlot(i, j):
   toVisit = {key(i,j)}
   visited = set()
 
-  # This is a little silly to seperate things out this way but it works
-  northSides, southSides, eastSides, westSides = set(), set(), set(), set()
+  sides = set()
 
   plantType = board[i][j]
 
@@ -98,22 +97,14 @@ def fillPlot(i, j):
       newKey = key(ii, jj)
       if not onBoard(ii, jj) or board[ii][jj] != plantType:
         perimeter += 1
-        if dir == "N": northSides.add(newKey)
-        elif dir == "S": southSides.add(newKey)
-        elif dir == "E": eastSides.add(newKey)
-        elif dir == "W": westSides.add(newKey)
+        sides.add(sideKey(*neighbor))
 
       else:
         if newKey not in visited:
           toVisit.add(newKey)
 
-  # print(plantType)
-  sideTotal = totalSide(northSides, "N")
-  sideTotal += totalSide(southSides, "S")
-  sideTotal += totalSide(eastSides, "E")
-  sideTotal += totalSide(westSides, "W")
   
-  return area, perimeter, sideTotal
+  return area, perimeter, totalSides(sides)
 
 partOne = 0
 partTwo = 0
