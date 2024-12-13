@@ -93,7 +93,7 @@ def fillPlot(i, j):
     area += 1
 
     for neighbor in possibleNeighbors(i, j):
-      ii, jj, dir = neighbor
+      ii, jj, _ = neighbor
       newKey = key(ii, jj)
       if not onBoard(ii, jj) or board[ii][jj] != plantType:
         perimeter += 1
