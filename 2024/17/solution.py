@@ -3,12 +3,6 @@ debugFile = ''
 write = False
 
 
-# Register A: 729
-# Register B: 0
-# Register C: 0
-
-# Program: 0,1,5,4,3,0
-
 regs = dict()
 instructions = []
 
@@ -81,7 +75,7 @@ def findPartTwo():
   for j in range(len(instructions)):
     nextAnswers = []
     
-    # build up from reverse
+    # build up program from reverse
     wantedIndex = len(instructions)-1-j
     wanted = instructions[wantedIndex:]
 
@@ -96,6 +90,7 @@ def findPartTwo():
           nextAnswers.append(answer+i)
     
     answers = nextAnswers
+
   return min(answers)
 
 partOne = runProgram(regs["a"], regs["b"], regs["c"])
